@@ -6,14 +6,6 @@ DevFlow AI combines authentication, project/task management, analytics, and four
 
 ---
 
-## 📺 Demo
-
-- **Demo video:** _add your video link here_
-- **Live deployment:** _add your deployed link here (optional)_
-- **GitHub repo:** _add your repo link here_
-
----
-
 ## ✨ Features
 
 ### Core
