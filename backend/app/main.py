@@ -53,3 +53,11 @@ app.include_router(focus_sessions.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+@app.get("/")
+def read_root():
+    return {"message": "DevFlow AI API is running successfully!"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
