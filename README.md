@@ -1,119 +1,143 @@
-# DevFlow AI — Developer Productivity Dashboard
+# DevFlow AI
 
-DevFlow AI is a complete full-stack developer project and task management platform with an integrated AI Task Generator.
+**An AI-powered developer project & task management platform.** Built for Innovation Hacks — Task 4.
 
-## Features
+DevFlow AI combines authentication, project/task management, analytics, and four distinct Gemini-powered AI features into one full-stack app: a FastAPI backend, a Next.js frontend, and SQLite for storage.
 
-- **Authentication**: JWT-based login and registration.
-- **Projects**: Create, edit, delete, and view development projects with progress tracking.
-- **Tasks**: Create, edit, assign, delete, and manage tasks with statuses, priorities, and due dates.
-- **Dashboard**: High-level overview of projects, tasks, and recent activity.
-- **AI Task Generator**: Describe a project goal, and Google Gemini AI will generate actionable tasks you can instantly add to your project.
-- **Task Assignment**: Assign tasks to any registered user, filter tasks by assignee, and see assignee badges on task cards.
-- **AI Weekly Digest**: A rolling 7-day recap of tasks completed/created and projects touched, with an optional Gemini-written narrative summary.
-- **AI Focus Coach**: Ranks your open tasks by priority, status and due date (overdue, due soon) and, on request, asks Gemini for a short coaching note.
-- **Analytics**: Task status and priority distribution, project progress, overdue / due-this-week counts and tasks created over the last 14 days.
-- **AI Project Health**: Every project page shows a 0-100 health score with risk flags (overdue, stale, unstarted high-priority work) and can ask Gemini for a written status report with next steps.
-- **Focus Timer**: Pomodoro-style sessions (15/25/45/60 min) that can be tied to a task, with daily totals, a streak counter and your most-focused tasks.
-- **Settings**: Light/dark theme (saved in the browser), change password and log out.
-- **Responsive UI**: Clean, modern SaaS design that works on desktop, tablet, and mobile.
+---
 
-## Technology Stack
+## 📺 Demo
 
-**Frontend**:
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
+- **Demo video:** _add your video link here_
+- **Live deployment:** _add your deployed link here (optional)_
+- **GitHub repo:** _add your repo link here_
 
-**Backend**:
-- FastAPI (Python)
-- SQLAlchemy (ORM)
-- Pydantic (Data validation)
-- SQLite (Local DB)
-- JWT (Authentication)
+---
 
-**AI**:
-- Google Gemini API (`gemini-3.5-flash`)
+## ✨ Features
 
-## Architecture
+### Core
+
+- **Authentication** — JWT-based register, login, logout, and protected routes.
+- **Dashboard** — project overview, task statistics, progress tracking, and a recent activity feed.
+- **Projects** — create, edit, delete, and view project details with live progress bars.
+- **Tasks** — create, edit, delete; set status, priority, and due dates; assign to a user; search and filter.
+- **Task Assignment** — assign any task to a registered user, filter the task list by assignee, and see assignee badges on task cards.
+- **Analytics** — status/priority distribution, per-project progress, overdue and due-this-week counts, and a 14-day task-creation trend.
+- **Settings** — light/dark theme, change password, log out.
+
+### AI-powered (Google Gemini)
+
+DevFlow AI implements four AI features, well beyond the one required by the brief:
+
+| Feature | What it does |
+|---|---|
+| **AI Task Generator** | Describe a project goal — Gemini returns 10–15 specific, non-duplicated, logically ordered tasks. You review and pick which ones to add. |
+| **AI Focus Coach** | Ranks your open tasks by urgency (overdue, due soon, priority, in-progress) and can ask Gemini for a short coaching note on what to tackle first. |
+| **AI Project Health** | A 0–100 health score per project from real signals (overdue tasks, stale to-dos, unstarted high-priority work), with an optional Gemini-written status report and next steps. |
+| **AI Weekly Digest** | A rolling 7-day recap of what got done, with an optional Gemini narrative summary — task/activity summarization. |
+
+Every AI feature validates Gemini's output against a Pydantic schema, requests strict JSON (no markdown/code fences), and degrades gracefully (clear error messages, no stack traces) if the API key is missing, invalid, rate-limited, or times out.
+
+### Bonus
+
+- **Focus Timer** — Pomodoro-style sessions (15/25/45/60 min), optionally tied to a task, with daily totals, a streak counter, and your most-focused tasks.
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js (App Router), TypeScript, Tailwind CSS |
+| Backend | FastAPI (Python), SQLAlchemy, Pydantic, JWT auth |
+| Database | SQLite (swap `DATABASE_URL` for PostgreSQL in production) |
+| AI | Google Gemini API (`gemini-3.5-flash`) |
+
+## 🏗 Architecture
 
 ```
-Browser 
-  ↓ (REST / JSON)
-Next.js Frontend 
-  ↓ (HTTP Requests)
-FastAPI REST API
-  ↓ (SQLAlchemy)
+Browser
+  ↓ REST / JSON
+Next.js Frontend
+  ↓ HTTP
+FastAPI Backend  ──────→  Google Gemini API
+  ↓ SQLAlchemy
 SQLite Database
 ```
-The FastAPI backend also communicates directly with the Gemini API to generate tasks securely.
 
-## Folder Structure
+The Gemini API key lives only in the backend's environment — it is never sent to the frontend, logged, or exposed in error messages.
+
+## 📁 Project Structure
 
 ```
-devflow-ai/
-├── backend/          # FastAPI Python application
-│   ├── app/          # Main application code (models, schemas, routers)
-│   ├── .env          # Backend environment variables
-│   └── requirements.txt
-├── frontend/         # Next.js React application
-│   ├── app/          # App router pages and layouts
-│   ├── components/   # Reusable UI components
-│   ├── lib/          # API client and utility functions
-│   └── .env.local    # Frontend environment variables
-├── .env.example      # Example environment variables
+final/
+├── backend/                  FastAPI application
+│   ├── app/
+│   │   ├── models.py         SQLAlchemy models (User, Project, Task, Activity, FocusSession)
+│   │   ├── schemas.py        Pydantic request/response schemas
+│   │   ├── auth.py           JWT auth, password hashing
+│   │   ├── focus.py          Rule-based task urgency scoring
+│   │   ├── health.py         Rule-based project health scoring
+│   │   └── routers/          auth, users, projects, tasks, dashboard, ai, focus_sessions
+│   ├── seed_demo.py          Optional: generates 6 demo projects (~58 tasks)
+│   ├── test_ai.py            End-to-end smoke test (real backend + Gemini call)
+│   ├── requirements.txt
+│   └── .env                  Backend environment variables (not committed)
+├── frontend/                 Next.js application
+│   ├── app/                  App Router pages (dashboard, projects, tasks, analytics, focus, settings)
+│   ├── components/           Reusable UI + feature components (AI cards, forms, layout)
+│   ├── lib/                  API client (lib/api.ts) and utilities
+│   └── .env.local            Frontend environment variables (not committed)
+├── .env.example
 └── README.md
 ```
 
-## Database Schema Overview
+## 🗄 Database Schema
 
-- **User**: Authentication details and basic profile.
-- **Project**: Represents a high-level project with a status and completion percentage.
-- **Task**: Represents a specific work item belonging to a project, with status, priority, and due date.
-- **Activity**: Audit log of actions performed by users.
+| Model | Purpose |
+|---|---|
+| `User` | Account and auth details |
+| `Project` | A project owned by a user, with a status |
+| `Task` | Belongs to a project; has status, priority, due date, and optional assignee |
+| `Activity` | Audit log of actions (created/updated/completed/assigned tasks, etc.) |
+| `FocusSession` | A logged Pomodoro session, optionally linked to a task |
 
-## API Endpoints
+## 🔌 API Reference
 
-- `POST /api/auth/register` - Create an account
-- `POST /api/auth/login` - Authenticate and get JWT
-- `GET /api/users/me` - Get current user profile
-- `PUT /api/users/me` - Update profile
-- `PUT /api/users/me/password` - Change password
-- `GET /api/projects` - List user's projects
-- `POST /api/projects` - Create a project
-- `GET /api/projects/{id}` - Get project details
-- `PUT /api/projects/{id}` - Update project
-- `DELETE /api/projects/{id}` - Delete project (and its tasks)
-- `GET /api/tasks` - List/search/filter tasks
-- `POST /api/tasks` - Create a task
-- `GET /api/tasks/{id}` - Get task details
-- `PUT /api/tasks/{id}` - Update a task
-- `DELETE /api/tasks/{id}` - Delete a task
-- `GET /api/dashboard` - Get dashboard statistics
-- `GET /api/users` - List all registered users (used for the assignee picker)
-- `GET /api/dashboard/analytics` - Analytics (distributions, project progress, overdue)
-- `POST /api/ai/generate-tasks` - Generate tasks with Gemini
-- `POST /api/ai/add-tasks` - Add generated tasks
-- `GET /api/ai/digest` - AI weekly digest (`?days=N&narrate=true` for a Gemini recap)
-- `GET /api/ai/project-health/{project_id}` - Project health score (`?report=true` adds a Gemini status report)
-- `POST /api/focus/sessions` - Log a completed focus session
-- `GET /api/focus/summary` - Focus totals, streak and top tasks
-- `GET /api/ai/focus-coach` - Ranked focus tasks (`?advice=true` adds a Gemini coaching note)
+**Auth**
+- `POST /api/auth/register` — create an account
+- `POST /api/auth/login` — authenticate, get a JWT
 
-## Optional demo data
+**Users**
+- `GET /api/users` — list registered users (assignee picker)
+- `GET /api/users/me` / `PUT /api/users/me` — profile
+- `PUT /api/users/me/password` — change password
 
-To fill the app with 6 sample projects (~9-12 tasks each, some assigned to a second demo teammate account) plus focus sessions, run this from `backend/` with the venv active:
+**Projects**
+- `GET|POST /api/projects`, `GET|PUT|DELETE /api/projects/{id}`
 
-```bash
-python seed_demo.py you@email.com
-```
+**Tasks**
+- `GET|POST /api/tasks`, `GET|PUT|DELETE /api/tasks/{id}` — supports `status`, `priority`, `assignee_id`, `project_id`, `search`, `sort_by`/`sort_order` query params
 
-Delete the project "Demo: Product Launch" in the app to remove it again.
+**Dashboard & Analytics**
+- `GET /api/dashboard` — overview stats
+- `GET /api/dashboard/analytics` — distributions, project progress, overdue/due-this-week
 
-## Environment Variables
+**AI**
+- `POST /api/ai/generate-tasks` — generate 10–15 tasks from a project goal
+- `POST /api/ai/add-tasks` — save selected generated tasks
+- `GET /api/ai/focus-coach?advice=true` — ranked focus tasks + optional Gemini note
+- `GET /api/ai/project-health/{project_id}?report=true` — health score + optional Gemini report
+- `GET /api/ai/digest?days=7&narrate=true` — activity recap + optional Gemini summary
 
-Create a `.env` file in the `backend/` directory:
+**Focus Timer**
+- `POST /api/focus/sessions` — log a completed session
+- `GET /api/focus/summary` — totals, streak, top tasks
 
+## ⚙️ Environment Variables
+
+`backend/.env`:
 ```env
 DATABASE_URL=sqlite:///./devflow.db
 SECRET_KEY=devflow-secret-key-for-development-only
@@ -122,55 +146,70 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-Create a `.env.local` file in the `frontend/` directory:
-
+`frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## Setup & Running Locally
+`GEMINI_API_KEY` lives only in `backend/.env`, is never committed (see `.gitignore`), never sent to the frontend, and never appears in logs.
 
-### 1. Backend Setup
+## 🚀 Getting Started
+
+**Prerequisites:** Python 3.11+, Node.js 18+, a [Gemini API key](https://aistudio.google.com/app/apikey) (free tier is fine).
 
 ```bash
+# 1. Clone
+git clone <your-repo-url>
+cd final
+
+# 2. Backend
 cd backend
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
+cp ../.env.example .env            # then edit .env and add your Gemini key
+python -m uvicorn app.main:app --reload --port 8000
 
-### 2. Frontend Setup
-
-```bash
+# 3. Frontend (in a new terminal)
 cd frontend
 npm install
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+npm run dev
 ```
 
-### 3. Run the Backend
+Open **http://localhost:3000**, register an account, and you're in.
+
+### Optional: load demo data
+
+Fills the account with 6 projects and ~58 tasks in every state (done, in progress, overdue, due soon, stale, unassigned), plus a second "teammate" account for testing task assignment:
 
 ```bash
 cd backend
 source .venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python seed_demo.py you@email.com
 ```
-The database will be automatically created on startup.
 
-### 4. Run the Frontend
+### Optional: run the smoke test
+
+Exercises the real backend end-to-end (health check, auth, AI task generation with a live Gemini call, saving, focus coach, project health, digest, and task assignment):
 
 ```bash
-cd frontend
-npm run dev
+cd backend
+source .venv/bin/activate
+python test_ai.py
 ```
-Open `http://localhost:3000` in your browser.
 
-## Gemini Setup
+## ☁️ Deployment Notes
 
-To use the AI Task Generator feature, you must set the `GEMINI_API_KEY` in `backend/.env`. 
-Get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
-If the key is missing, the backend will gracefully return a `503 Service Unavailable` error when trying to generate tasks.
+- **Database:** swap `DATABASE_URL` for a managed Postgres connection string (e.g. on Render/Railway).
+- **Security:** replace `SECRET_KEY` with a strong random value; never reuse the development one.
+- **Backend:** deploy the FastAPI app to Render/Railway; set `GEMINI_API_KEY` and `SECRET_KEY` as environment variables in the platform's dashboard, not in code.
+- **Frontend:** `npm run build`, then deploy to Vercel/Netlify; set `NEXT_PUBLIC_API_URL` to your deployed backend's URL.
 
-## Deployment Notes
+## 📄 License
 
-- **Database**: Change `DATABASE_URL` to a PostgreSQL connection string for production.
-- **Security**: Change `SECRET_KEY` to a strong random string.
-- **Frontend**: Build the Next.js app with `npm run build` and serve it, or deploy to Vercel/Netlify. Ensure `NEXT_PUBLIC_API_URL` points to your production backend URL.
+_Add a license if required by Innovation Hacks (e.g. MIT), or state "For educational purposes as part of the Innovation Hacks internship."_
+
+---
+
+Built for the **Innovation Hacks** Full-Stack Development Internship — Task 4.
