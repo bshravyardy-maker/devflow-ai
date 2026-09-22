@@ -198,10 +198,6 @@ python test_ai.py
 - **Backend:** deploy the FastAPI app to Render/Railway; set `GEMINI_API_KEY` and `SECRET_KEY` as environment variables in the platform's dashboard, not in code.
 - **Frontend:** `npm run build`, then deploy to Vercel/Netlify; set `NEXT_PUBLIC_API_URL` to your deployed backend's URL.
 
-## 📄 License
-
-_Add a license if required by Innovation Hacks (e.g. MIT), or state "For educational purposes as part of the Innovation Hacks internship."_
-
 ---
 
 Built for the **Innovation Hacks** Full-Stack Development Internship — Task 4.
